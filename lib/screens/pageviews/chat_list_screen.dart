@@ -171,8 +171,8 @@ class _ChatListContainerState extends State<ChatListContainer> {
                   Align(
                     alignment: Alignment.bottomRight,
                     child: Container(
-                      height: 30,
-                      width: 30,
+                      height: 13,
+                      width: 13,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: UniversalVariables.onlineDotColor,
