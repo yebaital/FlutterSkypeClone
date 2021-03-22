@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:skype_clone/constants/strings.dart';
 import 'package:skype_clone/models/message.dart';
 import 'package:skype_clone/models/user.dart';
 import 'package:skype_clone/utils/utilities.dart';
@@ -35,8 +36,8 @@ class FirebaseMethods {
 
   Future<bool> authenticateUser(FirebaseUser user) async {
     QuerySnapshot result = await firestore
-        .collection("users")
-        .where("email", isEqualTo: user.email)
+        .collection(USER_COLLECTION)
+        .where(EMAIL_FIELD, isEqualTo: user.email)
         .getDocuments();
 
     final List<DocumentSnapshot> docs = result.documents;
@@ -52,7 +53,7 @@ class FirebaseMethods {
         profilePhoto: currentUser.photoUrl,
         username: username);
     firestore
-        .collection("user")
+        .collection(USER_COLLECTION)
         .document(currentUser.uid)
         .setData(user.toMap(user));
   }
@@ -66,7 +67,7 @@ class FirebaseMethods {
   Future<List<User>> fetchAllUsers(FirebaseUser user) async {
     List<User> userList = [];
     QuerySnapshot querySnapshot =
-        await firestore.collection("user").getDocuments();
+        await firestore.collection(USER_COLLECTION).getDocuments();
 
     for (var i = 0; i < querySnapshot.documents.length; i++) {
       if (querySnapshot.documents[i].documentID != user.uid) {
@@ -81,13 +82,13 @@ class FirebaseMethods {
     var messageMap = message.toMap();
 
     await firestore
-        .collection("messages")
+        .collection(MESSAGES_COLLECTION)
         .document(message.senderId)
         .collection(message.receiverId)
         .add(messageMap);
 
     return await firestore
-        .collection("messages")
+        .collection(MESSAGES_COLLECTION)
         .document(message.receiverId)
         .collection(message.senderId)
         .add(messageMap);
