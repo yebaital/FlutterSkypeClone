@@ -4,7 +4,7 @@ import 'package:skype_clone/models/call.dart';
 
 class CallMethods {
   final CollectionReference callCollection =
-      Firestore.instance.collection(CALL_COLLECTION);
+  Firestore.instance.collection(CALL_COLLECTION);
 
   Stream<DocumentSnapshot> callStream({String uid}) =>
       callCollection.document(uid).snapshots();
