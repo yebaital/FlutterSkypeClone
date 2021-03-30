@@ -1,27 +1,70 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:skype_clone/constants/strings.dart';
+import 'package:skype_clone/models/contact.dart';
 import 'package:skype_clone/models/message.dart';
 import 'package:skype_clone/models/user.dart';
 
 class ChatMethods {
-
   static final Firestore _firestore = Firestore.instance;
+  final CollectionReference _messageCollection =
+      _firestore.collection(MESSAGES_COLLECTION);
+  final CollectionReference _userCollection =
+      _firestore.collection(USER_COLLECTION);
 
   Future<void> addMessageToDb(
       Message message, User sender, User receiver) async {
     var map = message.toMap();
 
-    await _firestore
-        .collection(MESSAGES_COLLECTION)
+    await _messageCollection
         .document(message.senderId)
         .collection(message.receiverId)
         .add(map);
 
-    return await _firestore
-        .collection(MESSAGES_COLLECTION)
+    addToContacts(senderId: message.senderId, receiverId: message.receiverId);
+
+    return await _messageCollection
         .document(message.receiverId)
         .collection(message.senderId)
         .add(map);
+  }
+
+  DocumentReference getContactsDocument({String of, String forContact}) =>
+      _userCollection
+          .document(of)
+          .collection(CONTACTS_COLLECTION)
+          .document(forContact);
+
+  addToContacts({String senderId, String receiverId}) async {
+    Timestamp currentTime = Timestamp.now();
+    await addToSendersContacts(senderId, receiverId, currentTime);
+    await addToReceiversContacts(senderId, receiverId, currentTime);
+  }
+
+  Future<void> addToSendersContacts(
+      String senderId, String receiverId, currentTime) async {
+    DocumentSnapshot senderSnapshot =
+        await getContactsDocument(of: senderId, forContact: receiverId).get();
+
+    if (!senderSnapshot.exists) {
+      Contact receiverContact = Contact(uid: receiverId, addedOn: currentTime);
+      var receiverMap = receiverContact.toMap(receiverContact);
+      await getContactsDocument(of: senderId, forContact: receiverId)
+          .setData(receiverMap);
+    }
+  }
+
+  Future<void> addToReceiversContacts(
+      String senderId, String receiverId, currentTime) async {
+    DocumentSnapshot receiverSnapshot =
+        await getContactsDocument(of: receiverId, forContact: senderId).get();
+
+    if (!receiverSnapshot.exists) {
+      Contact senderContact = Contact(uid: senderId, addedOn: currentTime);
+      var senderMap = senderContact.toMap(senderContact);
+      await getContactsDocument(of: receiverId, forContact: senderId)
+          .setData(senderMap);
+    }
   }
 
   void setImageMsg(String url, String receiverId, String senderId) async {
@@ -39,16 +82,27 @@ class ChatMethods {
     var map = message.toImageMap();
 
     // var map = Map<String, dynamic>();
-    await _firestore
-        .collection(MESSAGES_COLLECTION)
+    await _messageCollection
         .document(message.senderId)
         .collection(message.receiverId)
         .add(map);
 
-    _firestore
-        .collection(MESSAGES_COLLECTION)
+    _messageCollection
         .document(message.receiverId)
         .collection(message.senderId)
         .add(map);
   }
+
+  Stream<QuerySnapshot> fetchContacts({String userId}) => _userCollection
+      .document(userId)
+      .collection(CONTACTS_COLLECTION)
+      .snapshots();
+
+  Stream<QuerySnapshot> fetchLastMessageBetween(
+          {@required String senderId, @required String receiverId}) =>
+      _messageCollection
+          .document(senderId)
+          .collection(receiverId)
+          .orderBy("timestamp")
+          .snapshots();
 }
