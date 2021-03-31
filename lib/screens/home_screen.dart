@@ -8,6 +8,7 @@ import 'package:skype_clone/resources/auth_methods.dart';
 import 'package:skype_clone/screens/callscreens/pickup/pickup_layout.dart';
 import 'package:skype_clone/screens/pageviews/chat_list_screen.dart';
 import 'package:skype_clone/utils/universal_variables.dart';
+import 'package:skype_clone/widgets/log_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -104,11 +105,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             Container(
               child: ChatListScreen(),
             ),
-            Center(
-                child: Text(
-              "Call Logs",
-              style: TextStyle(color: Colors.white),
-            )),
+            LogScreen(),
             Center(
                 child: Text(
               "Contacts Screen",
