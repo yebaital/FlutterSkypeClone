@@ -4,51 +4,45 @@ import 'package:provider/provider.dart';
 import 'package:skype_clone/models/contact.dart';
 import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/chat_methods.dart';
+import 'package:skype_clone/screens/callscreens/pickup/pickup_layout.dart';
 import 'package:skype_clone/utils/universal_variables.dart';
 import 'package:skype_clone/widgets/appbar.dart';
 import 'package:skype_clone/widgets/contact_view.dart';
 import 'package:skype_clone/widgets/new_chat_button.dart';
 import 'package:skype_clone/widgets/quiet_box.dart';
+import 'package:skype_clone/widgets/skype_appbar.dart';
 import 'package:skype_clone/widgets/user_circle.dart';
 
 class ChatListScreen extends StatelessWidget {
-  CustomAppBar customAppBar(BuildContext context) {
-    return CustomAppBar(
-      leading: IconButton(
-        icon: Icon(Icons.notifications),
-        color: Colors.white,
-        onPressed: () {},
-      ),
-      title: UserCircle(),
-      centerTitle: true,
-      actions: [
-        IconButton(
-          onPressed: () {
-            Navigator.pushNamed(context, "/search_screen");
-          },
-          icon: Icon(
-            Icons.search,
-            color: Colors.white,
-          ),
-        ),
-        IconButton(
-          onPressed: () {},
-          icon: Icon(
-            Icons.more_vert,
-            color: Colors.white,
-          ),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: UniversalVariables.blackColor,
-      appBar: customAppBar(context),
-      floatingActionButton: NewChatButton(),
-      body: ChatListContainer(),
+    return PickupLayout(
+      scaffold: Scaffold(
+        backgroundColor: UniversalVariables.blackColor,
+        appBar: SkypeAppBar(
+          title: UserCircle(),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.pushNamed(context, "/search_screen");
+              },
+              icon: Icon(
+                Icons.search,
+                color: Colors.white,
+              ),
+            ),
+            IconButton(
+              onPressed: () {},
+              icon: Icon(
+                Icons.more_vert,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+        floatingActionButton: NewChatButton(),
+        body: ChatListContainer(),
+      ),
     );
   }
 }
